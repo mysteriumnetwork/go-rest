@@ -18,7 +18,9 @@ type Validator struct {
 }
 
 func NewValidator() *Validator {
-	return &Validator{}
+	return &Validator{
+		fields: map[string]FieldError{},
+	}
 }
 
 func (v *Validator) Fail(field string, errorCode string, message string) {
