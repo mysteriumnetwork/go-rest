@@ -6,7 +6,6 @@ package apierror
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,9 +27,6 @@ func TestAPIError_Error(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
-
-	fmt.Println(w.Code)
-	fmt.Println(w.Body.String())
 
 	var resErr APIError
 	err := json.Unmarshal(w.Body.Bytes(), &resErr)

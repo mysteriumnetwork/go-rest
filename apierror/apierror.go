@@ -51,7 +51,6 @@ func Parse(response *http.Response) *APIError {
 	var apiErr APIError
 	blob, _ := ioutil.ReadAll(response.Body)
 
-	fmt.Println(string(blob))
 	switch response.Header.Get("Content-Type") {
 	case ContentTypeV1:
 		if err := json.Unmarshal(blob, &apiErr); err != nil {

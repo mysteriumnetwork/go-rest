@@ -2,7 +2,6 @@ package gin
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -17,7 +16,6 @@ import (
 func echoPageRequestServer() *httptest.Server {
 	r := gin.Default()
 	r.GET("/", Middleware, func(c *gin.Context) {
-		fmt.Println("dududu")
 		pageRequest := Request(c)
 		c.JSON(200, pageRequest)
 	})
