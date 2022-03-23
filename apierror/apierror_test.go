@@ -35,7 +35,7 @@ func TestAPIError_Error(t *testing.T) {
 	assert.Equal(t, "Request validation failed", resErr.Message())
 	assert.Equal(t, map[string]FieldError{
 		"amount": {
-			Error:   ValidateErrRequired,
+			Code:    ValidateErrRequired,
 			Message: "'amount' is required",
 		},
 	}, resErr.Err.Fields)

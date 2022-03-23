@@ -25,21 +25,21 @@ func NewValidator() *Validator {
 
 func (v *Validator) Fail(field string, errorCode string, message string) {
 	v.fields[field] = FieldError{
-		Error:   errorCode,
+		Code:    errorCode,
 		Message: message,
 	}
 }
 
 func (v *Validator) Required(field string) {
 	v.fields[field] = FieldError{
-		Error:   ValidateErrRequired,
+		Code:    ValidateErrRequired,
 		Message: fmt.Sprintf("'%s' is required", field),
 	}
 }
 
 func (v *Validator) Invalid(field string, message string) {
 	v.fields[field] = FieldError{
-		Error:   ValidateErrInvalidVal,
+		Code:    ValidateErrInvalidVal,
 		Message: message,
 	}
 }

@@ -31,7 +31,7 @@ func BadRequestField(message string, code string, field string) *APIError {
 	return &APIError{
 		Err: Err{Code: ErrCodeValidationFailed, Message: "Request validation failed", Fields: map[string]FieldError{
 			field: {
-				Error:   code,
+				Code:    code,
 				Message: message,
 			},
 		}},
@@ -57,7 +57,7 @@ func Conflict(message string, code string, field string) *APIError {
 	return &APIError{
 		Err: Err{Code: code, Message: message, Fields: map[string]FieldError{
 			field: {
-				Error:   code,
+				Code:    code,
 				Message: message,
 			},
 		}},

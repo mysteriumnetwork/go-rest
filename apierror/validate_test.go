@@ -19,15 +19,15 @@ func TestValidator(t *testing.T) {
 
 	assert.Equal(t, "Request validation failed", err.Message())
 	assert.Equal(t, err.Err.Fields["amount"], FieldError{
-		Error:   ValidateErrRequired,
+		Code:    ValidateErrRequired,
 		Message: "'amount' is required",
 	})
 	assert.Equal(t, err.Err.Fields["id"], FieldError{
-		Error:   ValidateErrInvalidVal,
+		Code:    ValidateErrInvalidVal,
 		Message: "ID invalid",
 	})
 	assert.Equal(t, err.Err.Fields["currency"], FieldError{
-		Error:   "not_supported",
+		Code:    "not_supported",
 		Message: "Unsupported currency",
 	})
 }
