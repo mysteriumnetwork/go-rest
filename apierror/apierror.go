@@ -30,6 +30,7 @@ type APIError struct {
 type Err struct {
 	Code    string                `json:"code"`
 	Message string                `json:"message"`
+	Detail  string                `json:"detail,omitempty"`
 	Fields  map[string]FieldError `json:"fields,omitempty"`
 }
 
@@ -41,6 +42,14 @@ type FieldError struct {
 // Message returns a message for humans.
 func (e *APIError) Message() string {
 	return e.Err.Message
+}
+
+// Detail returns a detailed message for humans.
+func (e *APIError) Detail() string {
+	if e.Err.Detail == "" {
+		return e.Err.Message
+	}
+	return e.Err.Detail
 }
 
 func (e *APIError) Error() string {

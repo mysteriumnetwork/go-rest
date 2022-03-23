@@ -4,7 +4,11 @@
 
 package apierror
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+	"strings"
+)
 
 func Error(status int, message string, code string) *APIError {
 	return &APIError{
@@ -28,20 +32,32 @@ func ParseFailed() *APIError {
 }
 
 func BadRequestField(message string, code string, field string) *APIError {
+	fields := map[string]FieldError{
+		field: {
+			Code:    code,
+			Message: message,
+		},
+	}
 	return &APIError{
-		Err: Err{Code: ErrCodeValidationFailed, Message: "Request validation failed", Fields: map[string]FieldError{
-			field: {
-				Code:    code,
-				Message: message,
-			},
-		}},
+		Err: Err{
+			Code:    ErrCodeValidationFailed,
+			Message: "Request validation failed",
+			Detail:  fmt.Sprintf("%s: %s", message, fieldsToDetail(fields)),
+			Fields:  fields,
+		},
 		Status: http.StatusBadRequest,
 	}
 }
 
 func BadRequestFields(fields map[string]FieldError) *APIError {
+	message := "Request validation failed"
 	return &APIError{
-		Err:    Err{Code: ErrCodeValidationFailed, Message: "Request validation failed", Fields: fields},
+		Err: Err{
+			Code:    ErrCodeValidationFailed,
+			Message: message,
+			Detail:  fmt.Sprintf("%s: %s", message, fieldsToDetail(fields)),
+			Fields:  fields,
+		},
 		Status: http.StatusBadRequest,
 	}
 }
@@ -54,13 +70,19 @@ func BadRequest(message string, code string) *APIError {
 }
 
 func Conflict(message string, code string, field string) *APIError {
+	fields := map[string]FieldError{
+		field: {
+			Code:    code,
+			Message: message,
+		},
+	}
 	return &APIError{
-		Err: Err{Code: code, Message: message, Fields: map[string]FieldError{
-			field: {
-				Code:    code,
-				Message: message,
-			},
-		}},
+		Err: Err{
+			Code:    code,
+			Message: message,
+			Fields:  fields,
+			Detail:  fmt.Sprintf("%s: %s", message, fieldsToDetail(fields)),
+		},
 		Status: http.StatusConflict,
 	}
 }
@@ -102,4 +124,13 @@ func ServiceUnavailable() *APIError {
 		Err:    Err{Code: ErrCodeUnavailable, Message: http.StatusText(http.StatusServiceUnavailable)},
 		Status: http.StatusServiceUnavailable,
 	}
+}
+
+func fieldsToDetail(fields map[string]FieldError) string {
+	var parts []string
+	for k, v := range fields {
+		parts = append(parts, fmt.Sprintf("%s: %s [%s]", k, v.Message, v.Code))
+	}
+
+	return strings.Join(parts, "; ")
 }

@@ -15,7 +15,11 @@ import (
 )
 
 func GetAPIError(c *gin.Context) {
-	c.AbortWithStatusJSON(400, BadRequestField("'amount' is required", ValidateErrRequired, "amount"))
+	v := NewValidator()
+	v.Required("amount")
+	v.Invalid("identity", "Not a valid identity")
+	response := v.Err()
+	c.AbortWithStatusJSON(400, response)
 }
 
 func TestAPIError_Error(t *testing.T) {
@@ -33,10 +37,13 @@ func TestAPIError_Error(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 400, resErr.Status)
 	assert.Equal(t, "Request validation failed", resErr.Message())
-	assert.Equal(t, map[string]FieldError{
-		"amount": {
-			Code:    ValidateErrRequired,
-			Message: "'amount' is required",
-		},
-	}, resErr.Err.Fields)
+	assert.Equal(t, "Request validation failed: amount: 'amount' is required [required]; identity: Not a valid identity [invalid_value]", resErr.Detail())
+	assert.Equal(t, FieldError{
+		Code:    ValidateErrRequired,
+		Message: "'amount' is required",
+	}, resErr.Err.Fields["amount"])
+	assert.Equal(t, FieldError{
+		Code:    ValidateErrInvalidVal,
+		Message: "Not a valid identity",
+	}, resErr.Err.Fields["identity"])
 }
