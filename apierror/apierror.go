@@ -21,12 +21,14 @@ const (
 	ErrCodeUnauthorized     = "shall_not_pass"
 )
 
+// APIError represents an error response from REST API service.
 type APIError struct {
 	Err    Err    `json:"error"`
 	Status int    `json:"status"`
 	Path   string `json:"path"`
 }
 
+// Err contains the error details.
 type Err struct {
 	Code    string                `json:"code"`
 	Message string                `json:"message"`
@@ -34,6 +36,7 @@ type Err struct {
 	Fields  map[string]FieldError `json:"fields,omitempty"`
 }
 
+// FieldError contains the reason why a field failed validation.
 type FieldError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -56,9 +59,11 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("server responded with an error: %v (%s) [%s] %s", e.Status, e.Path, e.Err.Code, e.Err.Message)
 }
 
+// Parse parses http.Response into an APIError closing (consuming) http.Response.Body.
 func Parse(response *http.Response) *APIError {
 	var apiErr APIError
 	blob, _ := ioutil.ReadAll(response.Body)
+	_ = response.Body.Close()
 
 	switch response.Header.Get("Content-Type") {
 	case ContentTypeV1:
