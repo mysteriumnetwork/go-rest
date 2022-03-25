@@ -73,7 +73,9 @@ func Parse(response *http.Response) *APIError {
 	default:
 		apiErr = makeDefault(response.StatusCode, blob)
 	}
-	apiErr.Path = response.Request.URL.String()
+	if response.Request != nil && response.Request.URL != nil {
+		apiErr.Path = response.Request.URL.String()
+	}
 	return &apiErr
 }
 
