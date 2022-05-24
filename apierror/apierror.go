@@ -6,6 +6,7 @@ package apierror
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -77,6 +78,29 @@ func Parse(response *http.Response) *APIError {
 		apiErr.Path = response.Request.URL.String()
 	}
 	return &apiErr
+}
+
+// TryParse parses http.Response into an APIError closing (consuming) http.Response.Body.
+// If header matches and error can be parsed in to APIError it will return that.
+// If No such header exists a regular error is returned with it's contents being a response body.
+func TryParse(response *http.Response) error {
+	blob, _ := ioutil.ReadAll(response.Body)
+	_ = response.Body.Close()
+
+	switch response.Header.Get("Content-Type") {
+	case ContentTypeV1:
+		var apiErr APIError
+		if err := json.Unmarshal(blob, &apiErr); err != nil {
+			apiErr = makeDefault(response.StatusCode, blob)
+		}
+		if response.Request != nil && response.Request.URL != nil {
+			apiErr.Path = response.Request.URL.String()
+		}
+
+		return &apiErr
+	default:
+		return errors.New(string(blob))
+	}
 }
 
 func makeDefault(statusCode int, payload []byte) APIError {
