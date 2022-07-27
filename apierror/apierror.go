@@ -50,10 +50,13 @@ func (e *APIError) Message() string {
 
 // Detail returns a detailed message for humans.
 func (e *APIError) Detail() string {
-	if e.Err.Detail == "" {
+	if e.Err.Detail != "" {
+		return e.Err.Detail
+	}
+	if e.Err.Message != "" {
 		return e.Err.Message
 	}
-	return e.Err.Detail
+	return e.Error()
 }
 
 func (e *APIError) Error() string {
