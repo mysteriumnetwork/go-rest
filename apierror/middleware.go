@@ -26,6 +26,13 @@ var DefaultErrStatic, _ = json.Marshal(defaultErr())
 // ErrorHandler gets the first error from request context and formats it to an error response.
 func ErrorHandler(c *gin.Context) {
 	c.Next()
+
+	// If something already wrote a response (e.g. SuperTokens),
+	// do not write our own error envelope.
+	if c.Writer.Written() {
+		return
+	}
+
 	if len(c.Errors) < 1 {
 		return
 	}
